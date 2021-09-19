@@ -54,7 +54,7 @@ sudo ./isTranspFwd.sh $ip  # requires dig
 To perform a single dnsRoute++ measurement, please run:
 
 ```bash
-./dnsRoute++.py $ip  # configure interface in script
+sudo ./dnsRoute++.py $ip  # configure interface in script
 ```
 
 ## Testing
