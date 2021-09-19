@@ -30,6 +30,35 @@ If you want this server to work globally, i.e. any DNS client is able to receive
 
 We own the zone `.nawrocki.berlin.` and refer all queries for `*.research.nawrocki.berlin.` to the rr-mirror. We did this by creating an `A` record for the rr-mirror named `ns.nawrocki.berlin.` and then setting the `NS` record pointing to it.
 
+## Configuration
+
+You can set the server's public IP address and port in `rr-mirror.go`:
+
+```go
+server_ip := "141.22.213.44"
+server_port := 53
+```
+
+The name(s) for which the server should create mirrored answers is also configurable:
+
+```go
+var records = map[string]bool{
+    rr-mirror.research.nawrocki.berlin.": true,
+}
+```
+
+The control record can be changed (other IP address, TTL, etc.) in the second `A` struct:
+
+```go
+rr_a_static := &dns.A {
+            Hdr: dns.RR_Header {
+                Name: q.Name,
+                Rrtype: dns.TypeA,
+                Class: dns.ClassINET,
+                Ttl: 3600 },
+            A: net.ParseIP("91.216.216.216")
+```
+
 ## Compilation & Running
 
 Compile with GO-tools:
@@ -66,33 +95,4 @@ $IP_QUAD9_BACKEND_RESOLVER
 ===== Test 3: Local Resolver =====
 $IP_YOUR_PUBLIC_ADDRESS
 91.216.216.216
-```
-
-## Configuration
-
-You can set the server's public IP address and port in `rr-mirror.go`:
-
-```go
-server_ip := "141.22.213.44"
-server_port := 53
-```
-
-The name(s) for which the server should create mirrored answers is also configurable:
-
-```go
-var records = map[string]bool{
-    rr-mirror.research.nawrocki.berlin.": true,
-}
-```
-
-The control record can be changed (other IP address, TTL, etc.) in the second `A` struct:
-
-```go
-rr_a_static := &dns.A {
-            Hdr: dns.RR_Header {
-                Name: q.Name,
-                Rrtype: dns.TypeA,
-                Class: dns.ClassINET,
-                Ttl: 3600 },
-            A: net.ParseIP("91.216.216.216")
 ```

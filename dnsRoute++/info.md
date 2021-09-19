@@ -19,6 +19,26 @@ numpy
 
 This script sends bursts (default=30) of DNS requests for the same name. Some DDoS mitigation might be sensible to this. Also, for transparent forwarders, you will receive DNS responses  from hosts which you did not contact in the first place. This means that your scanner must not be behind a NAT middlebox.
 
+## Configuration
+
+### Burst Size
+
+We are sending DNS request burst to map the paths. The default is to send 30 packets, each with an increasing TTL (0..29). In some rare cases you might want to increase the burst size:
+
+```bash
+IP_CLIENT = "141.22.28.227"
+IFACE_CLIENT = "eno1"
+```
+
+### Interface Settings
+
+Adjust source interface and IP address directly in the script:
+
+```bash
+IP_CLIENT = "141.22.28.227"
+IFACE_CLIENT = "eno1"
+```
+
 ## Compilation & Running
 
 Install all dependencies. Then, simply execute the run command below with root rights.
@@ -49,13 +69,13 @@ sudo ./test.sh
 
 ### Expected Output
 
-For each transparent forwarders, you will find a file `logs/` . We include 3 sample files as a reference. The log files are compressed CSV files with the following schema:
+For each transparent forwarder, you will find a file in `logs/` . We include 3 sample files as a reference. The log files are compressed CSV files with the following schema:
 
 ```bash
 hop.id|ip.response|ts.utc|ip.scanner|ip.target|pkt.layers
 ```
 
-Example below for `103.97.77.129`: Please note how we reach the transparent forwarder at hop 15, and its public resolver `8.8.8.8` at hop 23.
+Example below for `103.97.77.129`: Please note that we reach the transparent forwarder at hop 15 and continue to map the path until its public resolver `8.8.8.8` at hop 23.
 
 ```bash
 $ zcat sample_dnsroute_103.97.77.129.csv.gz
@@ -86,24 +106,3 @@ $ zcat sample_dnsroute_103.97.77.129.csv.gz
 28|8.8.8.8|2021-07-29 18:08:03.785123|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""172.217.44.194"" "
 29|8.8.8.8|2021-07-29 18:08:03.754496|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""172.253.211.67"" "
 ```
-
-## Configuration
-
-### Burst Size
-
-We are sending DNS request burst to map the paths. The default is to send 30 packets, each with an increasing TTL (0..29). In some rare cases you might want to increase the burst size:
-
-```bash
-IP_CLIENT = "141.22.28.227"
-IFACE_CLIENT = "eno1"
-```
-
-### Interface Settings
-
-Adjust source interface and IP address directly in the script:
-
-```bash
-IP_CLIENT = "141.22.28.227"
-IFACE_CLIENT = "eno1"nt:
-```
-

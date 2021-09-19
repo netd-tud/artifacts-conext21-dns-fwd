@@ -27,62 +27,6 @@ You can adjust the network prefix in this script for each vantage point type. Ex
 
 If you want these sensors to work globally, i.e. any DNS scanner is able to discover these sensors, you need a publicly routed prefix; we use `91.216.216.0/24` which is announced at an IXP. Also, you need an Upstream which does not filter spoofed packets or a direct link to the public DNS resolver (e.g., Google).
 
-## Compilation & Running
-
-Per default, the sensors listen on port 53. You need root rights to run the sensors.
-
-```bash
-sudo ./block_icmp.sh
-sudo ./run.sh proxy      # in: prefix.51, out: prefix.51
-sudo ./run.sh localfwd   # in: prefix.52, out: prefix.53
-sudo ./run.sh remotefwd  # in: prefix.54, out: xxx
-```
-
-## Testing
-
-Running these sensors locally should work as described above. However, the sensors require a very specific environment to operate globally. Therefore, to offer a real-world test, we currently run our servers which you can test against. 
-
-Warning: These tests will not work if your scanning behind a NAT. This is because you will receive answers from IP addresses for which you did not initiate a communication. This applies to `localfwd` and `remotefwd` mode.
-
-Also, please keep in mind that the honeypots are configured with a rate limiting. You will receive only one answer per 5 minutes from each sensor:
-
-```python
-# rate limit per /24 prefix
-p24_ttl = 10 if debug else 300
-p24_cache = TTLCache(maxsize=100000, ttl=p24_ttl)
-```
-
-To test our servers, simply run:
-
-```bash
-./test.sh  # test requires dig and no NAT, works every 5 minutes per src /24
-```
-
-### Expected Output
-
-```bash
-===== Test 1: proxy @91.216.216.51 =====
-;; ANSWER SECTION:
-google.com.		106	IN	A	216.58.213.238
---
-;; SERVER: 91.216.216.51#53(91.216.216.51)
-;; WHEN: Sun Sep 19 16:13:39 CEST 2021
-
-===== Test 2: localfwd @91.216.216.52 =====
-;; ANSWER SECTION:
-google.com.		106	IN	A	216.58.213.238
---
-;; SERVER: 91.216.216.53#53(91.216.216.52)
-;; WHEN: Sun Sep 19 16:13:40 CEST 2021
-
-===== Test 3: remotefwd @91.216.216.54 =====
-;; ANSWER SECTION:
-google.com.		106	IN	A	216.58.213.238
---
-;; SERVER: 8.8.8.8#53(91.216.216.54)
-;; WHEN: Sun Sep 19 16:13:41 CEST 2021
-```
-
 ## Configuration
 
 ### Vantage Point Name
@@ -151,4 +95,60 @@ RESOLVER_LIST = {
         "Q9": "9.9.9.9",
     }
 RESOLVER_IP = RESOLVER_LIST["Q8"]
+```
+
+## Compilation & Running
+
+Per default, the sensors listen on port 53. You need root rights to run the sensors.
+
+```bash
+sudo ./block_icmp.sh
+sudo ./run.sh proxy      # in: prefix.51, out: prefix.51
+sudo ./run.sh localfwd   # in: prefix.52, out: prefix.53
+sudo ./run.sh remotefwd  # in: prefix.54, out: xxx
+```
+
+## Testing
+
+Running these sensors locally should work as described above. However, the sensors require a very specific environment to operate globally. Therefore, to offer a real-world test, we currently run our servers which you can test against. 
+
+Warning: These tests will not work if your scanning behind a NAT. This is because you will receive answers from IP addresses for which you did not initiate a communication. This applies to `localfwd` and `remotefwd` mode.
+
+Also, please keep in mind that the honeypots are configured with a rate limiting. You will receive only one answer per 5 minutes from each sensor:
+
+```python
+# rate limit per /24 prefix
+p24_ttl = 10 if debug else 300
+p24_cache = TTLCache(maxsize=100000, ttl=p24_ttl)
+```
+
+To test our servers, simply run:
+
+```bash
+./test.sh  # test requires dig and no NAT, works every 5 minutes per src /24
+```
+
+### Expected Output
+
+```bash
+===== Test 1: proxy @91.216.216.51 =====
+;; ANSWER SECTION:
+google.com.		106	IN	A	216.58.213.238
+--
+;; SERVER: 91.216.216.51#53(91.216.216.51)
+;; WHEN: Sun Sep 19 16:13:39 CEST 2021
+
+===== Test 2: localfwd @91.216.216.52 =====
+;; ANSWER SECTION:
+google.com.		106	IN	A	216.58.213.238
+--
+;; SERVER: 91.216.216.53#53(91.216.216.52)
+;; WHEN: Sun Sep 19 16:13:40 CEST 2021
+
+===== Test 3: remotefwd @91.216.216.54 =====
+;; ANSWER SECTION:
+google.com.		106	IN	A	216.58.213.238
+--
+;; SERVER: 8.8.8.8#53(91.216.216.54)
+;; WHEN: Sun Sep 19 16:13:41 CEST 2021
 ```
