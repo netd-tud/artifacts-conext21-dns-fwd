@@ -25,16 +25,15 @@ This script sends bursts (default=30) of DNS requests for the same name. Some DD
 
 We are sending DNS request burst to map the paths. The default is to send 30 packets, each with an increasing TTL (0..29). In some rare cases you might want to increase the burst size:
 
-```bash
-IP_CLIENT = "141.22.28.227"
-IFACE_CLIENT = "eno1"
+```python
+MAX_TTL = 60
 ```
 
 ### Interface Settings
 
 Adjust source interface and IP address directly in the script:
 
-```bash
+```python
 IP_CLIENT = "141.22.28.227"
 IFACE_CLIENT = "eno1"
 ```
