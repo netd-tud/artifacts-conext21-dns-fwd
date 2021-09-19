@@ -42,7 +42,7 @@ sudo ./run.sh remotefwd  # in: prefix.54, out: xxx
 
 Running these sensors locally should work as described above. However, the sensors require a very specific environment to operate globally. Therefore, to offer a real-world test, we currently run our servers which you can test against. 
 
-Warning: These test will not work if your scanning behind a NAT. This is because you will receive answers from IP addresses for which you did not initiate a communication. This applies to `localfwd` and `remotefwd` mode.
+Warning: These tests will not work if your scanning behind a NAT. This is because you will receive answers from IP addresses for which you did not initiate a communication. This applies to `localfwd` and `remotefwd` mode.
 
 Also, please keep in mind that the honeypots are configured with a rate limiting. You will receive only one answer per 5 minutes from each sensor:
 
@@ -67,18 +67,20 @@ google.com.		106	IN	A	216.58.213.238
 --
 ;; SERVER: 91.216.216.51#53(91.216.216.51)
 ;; WHEN: Sun Sep 19 16:13:39 CEST 2021
+
 ===== Test 2: localfwd @91.216.216.52 =====
 ;; ANSWER SECTION:
 google.com.		106	IN	A	216.58.213.238
 --
-;; SERVER: 91.216.216.51#53(91.216.216.51)
-;; WHEN: Sun Sep 19 16:13:39 CEST 2021
+;; SERVER: 91.216.216.53#53(91.216.216.52)
+;; WHEN: Sun Sep 19 16:13:40 CEST 2021
+
 ===== Test 3: remotefwd @91.216.216.54 =====
 ;; ANSWER SECTION:
 google.com.		106	IN	A	216.58.213.238
 --
-;; SERVER: 91.216.216.51#53(91.216.216.51)
-;; WHEN: Sun Sep 19 16:13:39 CEST 2021
+;; SERVER: 8.8.8.8#53(91.216.216.54)
+;; WHEN: Sun Sep 19 16:13:41 CEST 2021
 ```
 
 ## Configuration
@@ -118,7 +120,7 @@ prefix = prefixes[vp]
 
 Configure interfaces:
 
-`in` interface is used for receiving requests from client. In our case, we can receive traffic for the current prefix on 3 different interfaces.
+`in` interface is used for receiving requests from clients. In our case, we can receive traffic for the current prefix on 3 different interfaces.
 
 `dns` interface is used for communicating with the public DNS resolver.
 
