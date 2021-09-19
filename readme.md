@@ -18,5 +18,8 @@ This repository is structured as follows:
 
 ### Minimal Test Setups
 
-Each tool contains a test script which allows to test each artifact with a minimal setup.
-1. `dnsRoute++`: [Configure the interface](https://github.com/ilabrg/artifacts-conext21-dns-fwd/blob/main/dnsRoute++/readme.md#interface-settings), then [run the test script for large measurement](https://github.com/ilabrg/artifacts-conext21-dns-fwd/blob/main/dnsRoute++/readme.md#large-scale-measurements).
+Each tool contains a test script which allows to evaluate each artifact with a minimal setup:
+
+1. `dnsRoute++`: [Configure the interface](https://github.com/ilabrg/artifacts-conext21-dns-fwd/blob/main/dnsRoute++/readme.md#interface-settings), then [run the test script for large measurements](https://github.com/ilabrg/artifacts-conext21-dns-fwd/blob/main/dnsRoute++/readme.md#large-scale-measurements) as root.
+2. `dns-honeypot-sensors`: We offer test servers, so you can immediately [initiate the tests](https://github.com/ilabrg/artifacts-conext21-dns-fwd/tree/main/dns-honeypot-sensors#testing) as a normal user.
+3. `recursive-mirror-auth-server`: We offer test servers, so you can immediately [initiate the tests](https://github.com/ilabrg/artifacts-conext21-dns-fwd/tree/main/resolver-mirror-auth-server#testing) as a normal user.
