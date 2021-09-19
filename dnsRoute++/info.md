@@ -1,152 +1,109 @@
-# DNS Honeypot Sensors
+# DNSRoute++
 
-These scripts emulate 3 different types of open DNS speakers. The supported _modes_ are as follows:
-
-1. `proxy`: Recursive resolver. Incoming requests are resolved via a public resolver (e.g., Google). The answer is then relayed as-is to the querist. IP address of the response is the IP address of the sensor. This mode behaves like the common DNS amplifier.
-2. `localfwd`: Multi-interface resolver. Incoming requests are resolved via a public resolver (e.g., Google). IP address of the response is *not* the IP address of the sensor but actually another IP address from the same prefix.
-3. `remotefwd`: Transparent forwarder. Incoming requests are *forwarded* to a a public resolver (e.g., Google). This means we spoof the source IP address of the querist and that this sensor never observes the response -- the public resolver responds directly to the querist.
+This toolchain checks whether a given host (identified by an IP address) behaves like a transparent forwarder. Then, it maps the complete path until the host (similar to regular traceroute) and beyond, i.e., the path between the transparent forwarder and its recursive resolver.
 
 ## Requirements
 
 ### Python Tools
 
-This implementation is written in Python3. The only non-default requirements are:
+This implementation is written in Python3. The non-default requirements are:
 
 ```python
 scapy
-cachetools
+matplotlib
+pandas
+numpy
 ```
-
-### Firewall
-
-This implementation uses raw sockets which do not bind on specific ports. This means that next to our DNS response the OS will also automatically send an `ICMP not reachable` message for each incoming request. We have to suppress this. We do this prefix-wide with iptables, compare `./block_icmp.sh`.
-
-You can adjust the network prefix in this script for each vantage point type. Existing rules will remains untouched, we only append an `ICMP DROP` rule. Please see the configuration section.
 
 ### Network Infrastructure
 
-If you want these sensors to work globally, i.e. any DNS scanner is able to discover these sensors, you need a publicly routed prefix; we use `91.216.216.0/24` which is announced at an IXP. Also, you need an Upstream which does not filter spoofed packets or a direct link to the public DNS resolver (e.g., Google).
+This script sends bursts (default=30) of DNS requests for the same name. Some DDoS mitigation might be sensible to this. Also, for transparent forwarders, you will receive DNS responses  from hosts which you did not contact in the first place. This means that your scanner must not be behind a NAT middlebox.
 
 ## Compilation & Running
 
-Per default, the sensors listen on port 53. You need root rights to run the sensors.
+Install all dependencies. Then, simply execute the run command below with root rights.
+
+### Single IP address
+
+To test whether a single IP address is a transparent forwarder, please run:
 
 ```bash
-sudo ./block_icmp.sh
-sudo ./run.sh proxy      # in: prefix.51, out: prefix.51
-sudo ./run.sh localfwd   # in: prefix.52, out: prefix.53
-sudo ./run.sh remotefwd  # in: prefix.54, out: xxx
+sudo ./isTranspFwd.sh $ip  # requires dig
+```
+
+To perform a single dnsRoute++ measurement, please run:
+
+```bash
+./dnsRoute++.py $ip  # configure interface in script
 ```
 
 ## Testing
 
-Running these sensors locally should work as described above. However, the sensors require a very specific environment to operate globally. Therefore, to offer a real-world test, we currently run our servers which you can test against. 
+Testing dnsRoute++ without real transparent forwarders does not show its unique features. Therefore, we include a list of candidate IP addresses in `ip_list.txt.gz` . These are very likely to be transparent forwarders. Running the scan with check all IP addresses in this file. You can interrupt the scan anytime.
 
-Warning: These tests will not work if your scanning behind a NAT. This is because you will receive answers from IP addresses for which you did not initiate a communication. This applies to `localfwd` and `remotefwd` mode.
-
-Also, please keep in mind that the honeypots are configured with a rate limiting. You will receive only one answer per 5 minutes from each sensor:
-
-```python
-# rate limit per /24 prefix
-p24_ttl = 10 if debug else 300
-p24_cache = TTLCache(maxsize=100000, ttl=p24_ttl)
-```
-
-To test our servers, simply run:
+### Large Scale Measurements
 
 ```bash
-./test.sh  # test requires dig and no NAT, works every 5 minutes per src /24
+sudo ./test.sh
 ```
 
 ### Expected Output
 
+For each transparent forwarders, you will find a file `logs/` . We include 3 sample files as a reference. The log files are compressed CSV files with the following schema:
+
 ```bash
-===== Test 1: proxy @91.216.216.51 =====
-;; ANSWER SECTION:
-google.com.		106	IN	A	216.58.213.238
---
-;; SERVER: 91.216.216.51#53(91.216.216.51)
-;; WHEN: Sun Sep 19 16:13:39 CEST 2021
-===== Test 2: localfwd @91.216.216.52 =====
-;; ANSWER SECTION:
-google.com.		106	IN	A	216.58.213.238
---
-;; SERVER: 91.216.216.51#53(91.216.216.51)
-;; WHEN: Sun Sep 19 16:13:39 CEST 2021
-===== Test 3: remotefwd @91.216.216.54 =====
-;; ANSWER SECTION:
-google.com.		106	IN	A	216.58.213.238
---
-;; SERVER: 91.216.216.51#53(91.216.216.51)
-;; WHEN: Sun Sep 19 16:13:39 CEST 2021
+hop.id|ip.response|ts.utc|ip.scanner|ip.target|pkt.layers
+```
+
+Example below for `103.97.77.129`: Please note how we reach the transparent forwarder at hop 15, and its public resolver `8.8.8.8` at hop 23.
+
+```bash
+$ zcat sample_dnsroute_103.97.77.129.csv.gz
+0|141.22.28.1|2021-07-29 18:08:03.057401|141.22.28.227|103.97.77.129|Ether / IP / ICMP 141.22.28.1 > 141.22.28.227 time-exceeded ttl-zero-during-transit / IPerror / UDPerror
+1|141.22.28.1|2021-07-29 18:08:03.058744|141.22.28.227|103.97.77.129|Ether / IP / ICMP 141.22.28.1 > 141.22.28.227 time-exceeded ttl-zero-during-transit / IPerror / UDPerror
+2|141.22.4.148|2021-07-29 18:08:03.060273|141.22.28.227|103.97.77.129|Ether / IP / ICMP 141.22.4.148 > 141.22.28.227 time-exceeded ttl-zero-during-transit / IPerror / UDPerror
+3|188.1.237.173|2021-07-29 18:08:03.074027|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.'"" "
+4|193.178.185.34|2021-07-29 18:08:03.074716|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.berlin.'"" "
+5|184.105.223.110|2021-07-29 18:08:03.090222|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.berlin.'"" "
+6|184.105.65.41|2021-07-29 18:08:03.100262|141.22.28.227|103.97.77.129|Ether / IP / ICMP 184.105.65.41 > 141.22.28.227 time-exceeded ttl-zero-during-transit / IPerror / UDPerror
+7|72.52.92.130|2021-07-29 18:08:03.101770|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.berlin.'"" "
+8|184.104.195.178|2021-07-29 18:08:03.107009|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.berlin.'"" "
+9|184.104.193.125|2021-07-29 18:08:03.189217|141.22.28.227|103.97.77.129|Ether / IP / ICMP 184.104.193.125 > 141.22.28.227 time-exceeded ttl-zero-during-transit / IPerror / UDPerror
+10|184.105.65.13|2021-07-29 18:08:03.247121|141.22.28.227|103.97.77.129|Ether / IP / ICMP 184.105.65.13 > 141.22.28.227 time-exceeded ttl-zero-during-transit / IPerror / UDPerror
+11|65.49.108.46|2021-07-29 18:08:03.249621|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.'"" "
+14|103.129.248.19|2021-07-29 18:08:03.268866|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.berlin.'"" "
+15|103.97.77.129|2021-07-29 18:08:03.270506|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.berlin.'"" "
+16|103.129.248.19|2021-07-29 18:08:03.271780|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.berlin.'"" "
+17|103.129.248.18|2021-07-29 18:08:03.272724|141.22.28.227|103.97.77.129|Ether / IP / ICMP 103.129.248.18 > 141.22.28.227 time-exceeded ttl-zero-during-transit / IPerror / UDPerror
+20|74.125.118.220|2021-07-29 18:08:03.351729|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.'"" "
+21|209.85.255.81|2021-07-29 18:08:03.357193|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.'"" "
+22|72.14.232.107|2021-07-29 18:08:03.355483|141.22.28.227|103.97.77.129|"Ether / IP / ICMP / IPerror / UDPerror / DNS Qry ""b'rr-mirror.research.nawrocki.'"" "
+23|8.8.8.8|2021-07-29 18:08:03.794656|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""172.217.44.202"" "
+24|8.8.8.8|2021-07-29 18:08:03.798946|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""172.217.47.1"" "
+25|8.8.8.8|2021-07-29 18:08:03.796348|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""74.125.190.133"" "
+26|8.8.8.8|2021-07-29 18:08:03.722094|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""74.125.190.148"" "
+27|8.8.8.8|2021-07-29 18:08:03.844012|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""172.217.43.137"" "
+28|8.8.8.8|2021-07-29 18:08:03.785123|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""172.217.44.194"" "
+29|8.8.8.8|2021-07-29 18:08:03.754496|141.22.28.227|103.97.77.129|"Ether / IP / UDP / DNS Ans ""172.253.211.67"" "
 ```
 
 ## Configuration
 
-### Vantage Point Name
+### Burst Size
 
-First, you need to define a vantage point name in `config_vp.txt`, we use `ixp`:
-
-```bash
-$ cat config_vp.txt
-ixp
-```
-
-### Vantage Point Firewall
-
-You need to add a firewall configuration for this vantage point and its prefix in `block_icmp.sh`:
+We are sending DNS request burst to map the paths. The default is to send 30 packets, each with an increasing TTL (0..29). In some rare cases you might want to increase the burst size:
 
 ```bash
-if [ "$mode" = "ixp" ]; then
-    iptables -A INPUT -d 91.216.216.0/24 -p icmp -j DROP
-    iptables -A OUTPUT -s 91.216.216.0/24 -p icmp -j DROP
-fi
+IP_CLIENT = "141.22.28.227"
+IFACE_CLIENT = "eno1"
 ```
 
-### Vantage Point Sensors
+### Interface Settings
 
-Then, you can add your vantage point, prefix, and interfaces to `forwarder.py`:
+Adjust source interface and IP address directly in the script:
 
-Add current /24 prefix for vantage point:
-
-```python
-prefixes = {
-        "ixp": "91.216.216"
-    }
-prefix = prefixes[vp]
+```bash
+IP_CLIENT = "141.22.28.227"
+IFACE_CLIENT = "eno1"nt:
 ```
 
-Configure interfaces:
-
-`in` interface is used for receiving requests from client. In our case, we can receive traffic for the current prefix on 3 different interfaces.
-
-`dns` interface is used for communicating with the public DNS resolver.
-
-`out` interface is used for sending final DNS packet, i.e. final reply to clients or spoofed packet to resolver in  `remotefwd` mode.
-
-```python
-ifaces = {
-        ("proxy","ixp","in"):       (["eno3","vlan100","vlan224"],f"{prefix}.51"),
-        ("proxy","ixp","dns"):      ("vlan100",f"193.178.185.26"),
-        ("proxy","ixp","out"):      ("eno3",f"{prefix}.51"),
-
-        ("localfwd","ixp","in"):    (["eno3","vlan100","vlan224"],f"{prefix}.52"),
-        ("localfwd","ixp","dns"):   ("vlan100",f"193.178.185.26"),
-        ("localfwd","ixp","out"):   ("eno3",f"{prefix}.53"),
-
-        ("remotefwd","ixp","in"):   (["eno3","vlan100","vlan224"],f"{prefix}.54"),
-        ("remotefwd","ixp","dns"):  (None,None),
-        ("remotefwd","ixp","out"):  ("eno3",None),
-    }
-```
-
-You can also configure the public resolver:
-
-```python
-RESOLVER_LIST = {
-        "Q1": "1.1.1.1",
-        "Q8": "8.8.8.8",
-        "Q9": "9.9.9.9",
-    }
-RESOLVER_IP = RESOLVER_LIST["Q8"]
-```
