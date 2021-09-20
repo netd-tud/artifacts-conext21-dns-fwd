@@ -32,10 +32,8 @@ IFACE_CLIENT = "eno1"
 # dns config sniff config -- you can leave it as is
 QRY_NAME = "rr-mirror.research.nawrocki.berlin"
 CLIENT_PORT = random.randrange(10000, 65500, 100) # 3 digit ID, 2 digits TTL
-# default is 30
-# doubled the value for targets where no resolver
-# was reached within 30 hops
-MAX_TTL = 60
+# default is 30, increase if necessary
+MAX_TTL = 30
 BPF_FILTER = f"ip dst {IP_CLIENT} and (src port 53 and dst port {CLIENT_PORT})"
 
 # catch all ICMP responses (TTL exceeded)
