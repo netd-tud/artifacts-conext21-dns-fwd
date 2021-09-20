@@ -56,11 +56,9 @@ To perform dnsRoute++ measurement for a single IP address, please run:
 sudo ./run.py $ip  # configure (interface,ip) in dnsRoute script
 ```
 
-## Testing
+### Hitlist Measurements
 
 Testing dnsRoute++ without real transparent forwarders does not show its unique features. Therefore, we include a hitlist of candidate IP addresses in `ip_list.txt.gz` . These are very likely to be transparent forwarders. Executing `run.sh` without an argument will traverse all IP addresses in the hitlist. You can interrupt the scan anytime.
-
-### Large Scale Measurements
 
 ```bash
 sudo ./run.sh  # no argument triggers hitlist mode, configure (interface,ip) in dnsRoute script
