@@ -15,7 +15,8 @@ This repository is structured as follows:
 1. `dnsRoute++`: Traceroute implementation which maps paths *behind* transparent forwarders.
 2. `dns-honeypot-sensors`: Honeypots emulating various Open DNS speakers (ODNS), including transparent forwarders.
 3. `recursive-mirror-auth-server`: DNS nameserver which replies with the IP address of the querist, revealing the recursive resolver.
-
+4. `dns-measurement-analysis`: Postprocessing and analysing raw scan data.
+ 
 ### Minimal Test Setups
 
 Each tool contains a test script which allows to evaluate each artifact with a minimal setup:
@@ -23,3 +24,4 @@ Each tool contains a test script which allows to evaluate each artifact with a m
 1. `dnsRoute++`: [Configure the interface](https://github.com/ilabrg/artifacts-conext21-dns-fwd/blob/main/dnsRoute++/readme.md#interface-settings), then [run the test script for large measurements](https://github.com/ilabrg/artifacts-conext21-dns-fwd/blob/main/dnsRoute++/readme.md#large-scale-measurements) as root.
 2. `dns-honeypot-sensors`: We offer test servers, so you can immediately [initiate the tests](https://github.com/ilabrg/artifacts-conext21-dns-fwd/tree/main/dns-honeypot-sensors#testing) as a normal user.
 3. `recursive-mirror-auth-server`: We offer test servers, so you can immediately [initiate the tests](https://github.com/ilabrg/artifacts-conext21-dns-fwd/tree/main/resolver-mirror-auth-server#testing) as a normal user.
+4. `dns-measurement-analysis`: Configure the interface if necessary, then run the test script.
