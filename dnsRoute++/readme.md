@@ -26,7 +26,7 @@ This script sends bursts (default=30) of DNS requests for the same name. Some DD
 We are sending DNS request burst to map the paths. The default is to send 30 packets, each with an increasing TTL (0..29). In some rare cases you might want to increase the burst size:
 
 ```python
-MAX_TTL = 60
+MAX_TTL = 30
 ```
 
 ### Interface Settings
@@ -50,20 +50,18 @@ To test whether a single IP address is a transparent forwarder, please run:
 sudo ./isTranspFwd.sh $ip  # requires dig
 ```
 
-To perform a single dnsRoute++ measurement, please run:
+To perform dnsRoute++ measurement for a single IP address, please run:
 
 ```bash
-sudo ./dnsRoute++.py $ip  # configure interface in script
+sudo ./run.py $ip  # configure (interface,ip) in dnsRoute script
 ```
 
-## Testing
+### Hitlist Measurements
 
-Testing dnsRoute++ without real transparent forwarders does not show its unique features. Therefore, we include a list of candidate IP addresses in `ip_list.txt.gz` . These are very likely to be transparent forwarders. Running the scan with check all IP addresses in this file. You can interrupt the scan anytime.
-
-### Large Scale Measurements
+Testing dnsRoute++ without real transparent forwarders does not show its unique features. Therefore, we include a hitlist of candidate IP addresses in `ip_list.txt.gz` . These are very likely to be transparent forwarders. Executing `run.sh` without an argument will traverse all IP addresses in the hitlist. You can interrupt the scan anytime.
 
 ```bash
-sudo ./test.sh
+sudo ./run.sh  # no argument triggers hitlist mode, configure (interface,ip) in dnsRoute script
 ```
 
 ### Expected Output

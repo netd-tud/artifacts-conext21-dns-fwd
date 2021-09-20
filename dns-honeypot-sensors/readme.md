@@ -31,14 +31,9 @@ If you want these sensors to work globally, i.e. any DNS scanner is able to disc
 
 ### Vantage Point Name
 
-First, you need to define a vantage point name in `config_vp.txt`, we use `ixp`:
+First, you need to define a vantage point name, `ixp`. Then, you need to define rules and interfaces for this mode in two files.
 
-```bash
-$ cat config_vp.txt
-ixp
-```
-
-### Vantage Point Firewall
+#### Vantage Point Firewall
 
 You need to add a firewall configuration for this vantage point and its prefix in `block_icmp.sh`:
 
@@ -49,13 +44,15 @@ if [ "$mode" = "ixp" ]; then
 fi
 ```
 
-### Vantage Point Sensors
+#### Vantage Point Sensors
 
 Then, you can add your vantage point, prefix, and interfaces to `forwarder.py`:
 
 Add current /24 prefix for vantage point:
 
 ```python
+vp_list = ["ixp"]
+vp = vp_list[0]  # default vp
 prefixes = {
         "ixp": "91.216.216"
     }
@@ -102,10 +99,10 @@ RESOLVER_IP = RESOLVER_LIST["Q8"]
 Per default, the sensors listen on port 53. You need root rights to run the sensors.
 
 ```bash
-sudo ./block_icmp.sh
-sudo ./run.sh proxy      # in: prefix.51, out: prefix.51
-sudo ./run.sh localfwd   # in: prefix.52, out: prefix.53
-sudo ./run.sh remotefwd  # in: prefix.54, out: xxx
+sudo ./block_icmp.sh ixp     # blocks all unwanted ICMP for prefix
+sudo ./run.sh proxy ixp      # in: prefix.51, out: prefix.51
+sudo ./run.sh localfwd ixp   # in: prefix.52, out: prefix.53
+sudo ./run.sh remotefwd ixp  # in: prefix.54, out: xxx
 ```
 
 ## Testing

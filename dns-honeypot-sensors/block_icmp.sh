@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get current vp mode
-mode=$(cat config_vp.txt)
+mode="$1"
 
 # drop all ICMP traffic by the OS because it reports used ports still as closed
 # scapy works by sniffing the traffic and forging packets via raw sockets

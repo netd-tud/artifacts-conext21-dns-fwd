@@ -16,16 +16,9 @@ import sys
 debug = False # answers only for our name, lower rate limits
 strict_dns = True # checks incoming DNS messages for expected field values
 modes = ["proxy", "localfwd", "remotefwd"]
-mode = modes[0] # default mode
-vp_list = ["ixp"] # valid deployment points
-vp = None
-with open("config_vp.txt") as f:
-    vp = f.readline().strip()
-    if vp in vp_list:
-        print(f"# Loading config for VP {vp}.")
-    else:
-        print(f"# Unknown config {vp} -- exit.")
-        sys.exit(-1)
+mode = modes[0]  # default mode
+vp_list = ["ixp"]
+vp = vp_list[0]  # default vp
 
 prefixes = {
         "ixp": "91.216.216"
@@ -194,10 +187,11 @@ if __name__ == "__main__":
     # get mode for forwarder, set ifaces and ip addresses
     # all meta prints have '#' prefix
     if len(sys.argv) == 1:
-        print(f"# Init in mode {mode}, debug {debug}, strictDNS {strict_dns}.")
-    elif sys.argv[1] in modes:
+        print(f"# Init in mode {mode}, debug {debug}, strictDNS {strict_dns}, vp {vp}.")
+    elif len(sys.argv)==3 and sys.argv[1] in modes and sys.argv[2] in vp_list:
         mode = sys.argv[1]
-        print(f"# Init in mode {mode}, debug {debug}, strictDNS {strict_dns}.")
+        vp = sys.argv[2]
+        print(f"# Init in mode {mode}, debug {debug}, strictDNS {strict_dns}, vp {vp}.")
     else:
         sys.exit(-1)
 
