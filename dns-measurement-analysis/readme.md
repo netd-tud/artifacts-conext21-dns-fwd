@@ -3,6 +3,7 @@
 This directory contains real scan data from one of our scans and also python and shell scripts to process the data from raw pcap files to a clean dataframe used for the analysis.
 This directory also provides a complete dataframe of our scan from April 20th, 2021. We only provide two pcap files of the scan to keep storage usage low.
 The runscript can be used with your own scan results by simply replacing the right files as explained in section **Configuration of Runscript & Scan Data**.
+The python script ```PaperPlots.py``` is also available as a jupyter-notebook file and an HTML file for a better overview of the code.
 
 ## Requirements
 
@@ -52,7 +53,7 @@ The run script performs sanitation steps with the excerpt of the raw scan data a
 ### Produce Plots Using Complete Dataframe from April 20th, 2021
 
 Install python dependencies. Then, simply execute the command below.
-```python
+```bash
 python3 Paper_Plots.py ./dataframes/dataframe_complete_20210420.csv.gz
 ```
 
