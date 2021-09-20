@@ -1,0 +1,3 @@
+interface="eno1"
+node_ip="141.22.28.227"
+dns_request_complete="A,rr-mirror.research.nawrocki.berlin"

@@ -1,0 +1,13 @@
+startup_message	off
+defutf8		on
+hardcopydir	$HOME
+defscrollback	10000
+defmonitor	off
+hardstatus 	alwayslastline
+hardstatus 	string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %d/%m %{W}%c %{g}]'
+### TABS ###
+screen -t sh bash
+screen -t htop htop
+screen -t bmon bmon
+screen -t dump sudo ./dumpcap_dns_responses.sh complete
+screen -t zmap sudo ./zmap_dns_scan.sh complete
