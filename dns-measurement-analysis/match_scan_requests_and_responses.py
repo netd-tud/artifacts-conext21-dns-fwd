@@ -6,7 +6,6 @@ from tqdm import tqdm
 from functools import lru_cache
 import argparse
 
-IP_CLIENT = "141.22.28.227"
 
 def to_string_with_leading_zeros(number,digits):
     result = str(number)
@@ -14,7 +13,7 @@ def to_string_with_leading_zeros(number,digits):
         result = '0' + result
     return result
 
-def filter_traffic(files,directory):
+def filter_traffic(files,directory,IP_CLIENT):
     for i in tqdm(range(len(files)-1)):
         #print(files[i])
         df = pd.read_csv(
@@ -66,9 +65,10 @@ def filter_traffic(files,directory):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("csv_dir", help="absolute path to directory, where csv files are located")
+    parser.add_argument("ip_client", help="IP address of the client")
     args = parser.parse_args()
-    for directory in dirs:
-        logs_csv_scanner = glob.glob(f"{args.csv_dir}/dns_complete_*.csv.gz")
-        logs_csv_scanner.sort()
-        #print(logs_csv_scanner)
-        filter_traffic(logs_csv_scanner,args.csv_dir)
+    
+    logs_csv_scanner = glob.glob(f"{args.csv_dir}/dns_complete_*.csv.gz")
+    logs_csv_scanner.sort()
+    #print(logs_csv_scanner)
+    filter_traffic(logs_csv_scanner,args.csv_dir,args.ip_client)

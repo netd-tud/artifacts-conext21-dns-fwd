@@ -28,6 +28,13 @@ requests
 csv
 ```
 
+### Shell Scripts
+
+```bash
+tshark
+parallel
+```
+
 ### Interface Settings
 
 Adjust source IP address directly in the script:

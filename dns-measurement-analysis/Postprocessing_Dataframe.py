@@ -11,13 +11,20 @@ from tqdm import tqdm
 import pyasn as pyasn
 from functools import lru_cache
 import pycountry
+import argparse
+import requests
+from bs4 import BeautifulSoup
 
 import warnings
 warnings.filterwarnings('ignore')
 
-scan_dir = "./sanitized_csv_scan_data/"
-asndb_file = "./pyasn_db/IPASN/ipasn-2021-09-20.gz"
+parser = argparse.ArgumentParser()
+parser.add_argument("scan_dir", help="absolute path to directory, where sanitized data is located")
+parser.add_argument("asndb_file", help="path to asndb file")
+args = parser.parse_args()
 
+scan_dir = args.scan_dir
+asndb_file = args.asndb_file
 
 # In[2]:
 
@@ -139,9 +146,9 @@ df_two_arecords["dns_ttl"] = df_two_arecords["dns_ttl"].apply(delete_second_ttl)
 # In[17]:
 
 
-df_two_arecords["asn_request"] = df_two_arecords["ip_request"].apply(map_asn,args=(asndb))
-df_two_arecords["asn_response"] = df_two_arecords["ip_response"].apply(map_asn,args=(asndb))
-df_two_arecords["asn_arecord"] = df_two_arecords["a_record"].apply(map_asn,args=(asndb))
+df_two_arecords["asn_request"] = df_two_arecords["ip_request"].apply(map_asn,args=(asndb,))
+df_two_arecords["asn_response"] = df_two_arecords["ip_response"].apply(map_asn,args=(asndb,))
+df_two_arecords["asn_arecord"] = df_two_arecords["a_record"].apply(map_asn,args=(asndb,))
 
 
 # In[21]:

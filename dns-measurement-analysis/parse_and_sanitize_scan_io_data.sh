@@ -6,6 +6,10 @@ export workdir
 pcap_dir=$1
 export pcap_dir
 
+csv_dir=$2
+export csv_dir
+
+
 tasks="${workdir}/.tasks.txt"
 
 dns_sanitize="ip and not icmp and udp and dns"
@@ -24,7 +28,7 @@ parse_and_sanitize(){
         -e dns.flags.rcode -e dns.count.queries -e dns.count.answers \
         -e dns.count.auth_rr -e dns.count.add_rr -e dns.qry.name -e dns.resp.name -e dns.resp.ttl -e dns.a \
 	-E header=y -E separator=\; -E occurrence=a -E quote=d -E aggregator=, \
-	-T fields -o ip.defragment:FALSE | gzip > $pcap_dir/$csvfile.gz
+	-T fields -o ip.defragment:FALSE | gzip > $csv_dir/$csvfile.gz
     
     #parallel -j 1 --progress python3 $workdir/parse_and_sanitize.py $pcap_dir/$csvfile $workdir/sanitized-data/
     
