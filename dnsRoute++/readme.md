@@ -53,7 +53,7 @@ sudo ./isTranspFwd.sh $ip  # requires dig
 To perform dnsRoute++ measurement for a single IP address, please run:
 
 ```bash
-sudo ./run.py $ip  # configure interface in script
+sudo ./run.py $ip  # configure (interface,ip) in dnsRoute script
 ```
 
 ## Testing
@@ -63,7 +63,7 @@ Testing dnsRoute++ without real transparent forwarders does not show its unique 
 ### Large Scale Measurements
 
 ```bash
-sudo ./run.sh  # no argument will trigger hitlist mode
+sudo ./run.sh  # no argument triggers hitlist mode, configure (interface,ip) in dnsRoute script
 ```
 
 ### Expected Output
