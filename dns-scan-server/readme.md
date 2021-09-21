@@ -10,10 +10,14 @@ We recommend this for limitless scanning, otherwise you might run into trouble d
 
 ## Requirements
 
-We use `zmap` for scans. Get it e.g. [here](https://github.com/zmap/zmap).
+Overall, this artifact is a wrapper script for multiple well-known tools. We initiate a `screen` session with multiple tabs.
+
+We use `zmap` for scans. Get it e.g. [here](https://github.com/zmap/zmap). We utilize the `DNS` module for scanning which is not shipped in some `zmap` packages, therefore we recommend compiling from source.
 
 We use `dumpcap` to capture all outgoing and incoming traffic.
 You can get `dumpcap` e.g. by installing `wireshark` on your system.
+
+For convenience, this script also shows traffic statistics with `bmon`.
 
 ## Configuration & Running
 
