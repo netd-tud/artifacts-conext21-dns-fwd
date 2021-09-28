@@ -21,7 +21,6 @@ pyasn
 pycountry
 bs4
 requests
-csv
 ```
 
 ### Shell Scripts
