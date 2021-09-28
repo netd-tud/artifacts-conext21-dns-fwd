@@ -12,7 +12,13 @@ We recommend this for limitless scanning, otherwise you might run into trouble d
 
 Overall, this artifact is a wrapper script for multiple well-known tools. We initiate a `screen` session with multiple tabs.
 
-We use `zmap` for scans. Get it e.g. [here](https://github.com/zmap/zmap). We utilize the `DNS` module for scanning which is not shipped in some `zmap` packages, therefore we recommend compiling from source.
+We use `zmap` for scans. Get it e.g. [here](https://github.com/zmap/zmap). We utilize the `DNS` module for scanning which is not shipped in some `zmap` packages, therefore we recommend compiling from source. Currently, the DNS module appears to be broken, please use the following commit:
+
+```bash
+git clone https://github.com/zmap/zmap.git
+git checkout 623d069
+# install as described in zmaps INSTALL.md
+```
 
 We use `dumpcap` to capture all outgoing and incoming traffic.
 You can get `dumpcap` e.g. by installing `wireshark` on your system.
