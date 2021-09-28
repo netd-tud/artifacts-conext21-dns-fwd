@@ -17,6 +17,15 @@ scapy
 cachetools
 ```
 
+Please note that our tool supports incoming traffic on multiple devices, which is configured as a list. This is only possible on the most recent versions of scapy, please see the [docs](https://scapy.readthedocs.io/en/latest/api/scapy.sendrecv.html#scapy.sendrecv.sniff). To test whether your installed version supports multiple interfaces, you can check the local documentation:
+
+```bash
+scapy
+help(sniff)
+# [...]
+# iface – interface or list of interfaces (default: None for sniffing on all interfaces).
+```
+
 ### Firewall
 
 This implementation uses raw sockets which do not bind on specific ports. This means that next to our DNS response the OS will also automatically send an `ICMP not reachable` message for each incoming request. We have to suppress this. We do this prefix-wide with iptables, compare `./block_icmp.sh`.
