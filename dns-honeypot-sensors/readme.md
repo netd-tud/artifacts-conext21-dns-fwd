@@ -125,6 +125,8 @@ To test our servers, simply run:
 ./test.sh  # test requires dig and no NAT, works every 5 minutes per src /24
 ```
 
+The test script utilizes dig and the `+unexpected` option, which does not work in old dig versions. Also, it might get deprecated again in future releases. We have successfully tested dig version `9.16.6` and `9.16.21`.
+
 ### Expected Output
 
 ```bash
