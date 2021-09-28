@@ -6,7 +6,7 @@ This toolchain checks whether a given host (identified by an IP address) behaves
 
 ### Python Tools
 
-This implementation is written in Python3. The non-default requirements are:
+This implementation is written in Python3. We use f-strings in the script, so you need Python >3.6. The non-default requirements are:
 
 ```python
 scapy
