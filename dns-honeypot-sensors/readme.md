@@ -17,7 +17,7 @@ scapy
 cachetools
 ```
 
-Please note that our tool supports incoming traffic on multiple devices, which is configured as a list. This is only possible on the most recent versions of scapy, please see the [docs](https://scapy.readthedocs.io/en/latest/api/scapy.sendrecv.html#scapy.sendrecv.sniff). To test whether your installed version supports multiple interfaces, you can check the local documentation:
+Please note that our tool supports incoming traffic on multiple devices, which is configured as a list. This is only possible on the most recent versions of scapy, please see the [docs](https://scapy.readthedocs.io/en/latest/api/scapy.sendrecv.html#scapy.sendrecv.sniff). We used version 2.4.3 from linux repositories. To test whether your installed version supports multiple interfaces, you can check the local documentation:
 
 ```bash
 scapy
