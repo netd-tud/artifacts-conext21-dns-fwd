@@ -25,6 +25,7 @@ help(sniff)
 # [...]
 # iface – interface or list of interfaces (default: None for sniffing on all interfaces).
 ```
+Alternatively, you can simply adjust the `iface` parameter to a string or `None`.
 
 ### Firewall
 
