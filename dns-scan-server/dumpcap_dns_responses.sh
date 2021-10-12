@@ -8,7 +8,7 @@ pcap_max_size="100000"
 
 mode=$1
 dir_pcaps="./pcaps_dns_$mode/dns_complete_scan"
-mkdir $dir_pcaps
+mkdir -p $dir_pcaps
 name_pcaps="${dir_pcaps}/dns_${mode}_$(date +%s).pcap"
 #scan_filter="dst ${node_ip} and not icmp and udp src port 53"
 #capture also outgoing packets
@@ -21,5 +21,4 @@ dumpcap -Pi "$interface" \
     -b filesize:"$pcap_max_size"
 
 # fix access rights
-chown -R skyo:dev "${dir_pcaps}"
 chmod -R 775 "${dir_pcaps}"
