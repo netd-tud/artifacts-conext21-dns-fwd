@@ -3,8 +3,9 @@
 This repository contains the artifacts for the following paper:
 
     Transparent Forwarders: An Unnoticed Component of the Open DNS Infrastructure.
-    Authors anonymized.
+    Marcin Nawrocki, Maynard Koch, Thomas C. Schmidt, Matthias Wählisch.
     CoNEXT ’21, December 6–10, 2021, Virtual Event, USA.
+    https://doi.org/10.1145/3485983.3494872
 
 ## Structure
 
