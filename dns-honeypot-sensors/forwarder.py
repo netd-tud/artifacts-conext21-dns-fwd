@@ -143,7 +143,7 @@ def dns_responder(pktQueue):
                 pkt[DNS].rd == 1 and
                 pkt[DNS].opcode == 0 and
                 pkt[DNS].qdcount == 1 and pkt[DNS].ancount == 0 and
-                pkt[DNSQR].qclass == 1
+                (pkt[DNSQR].qclass == 1 or pkt[DNSQR].qclass == 3)
             ):
                 continue
 
